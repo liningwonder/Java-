@@ -1,0 +1,124 @@
+第一章 Spring特性概览
+
+第1节 Spring核心特性
+
+1.1 Spring核心特性
+目的：高内聚，低耦合
+
+(1)控制反转：Inversion Of Control IOC 低耦合
+
+控制反转：Inversion of Control 有两种方式:
+DI（被动 注入）依赖注入 Dependency Injection DI，注入又分为构造器注入和Setter注入.
+DL（主动 拉取）依赖查找 Dependency Lookup（EJB中的命名目录空间 JNDI查找）
+
+原来的EJB模型 可测试性？ 紧耦合
+
+Spring使用的是DI
+
+DI的目的是简化JAVA开发，并以接口的形式表示依赖实现松耦合，
+
+(2)面向切面编程：Aspect-oriented Programming AOP 高内聚
+AOP的核心为动态代理：JDK动态代理，CGLib动态代理
+AOP的目的是使服务模块化，业务具有更高的内聚性
+
+切点
+切面
+(3)模板代码 消除样式代码
+
+1.2 Spring bean 的配置
+
+(1)XML文件配置 beanId 一般为接口名小写 ClassPathXmlApplicationContext或FileSystemApplicationContext或XmlWebApplicationContext 
+<beans ...>
+<bean id="beanid" class="全限定类名">
+  <constructor-arg ref="beanId">  //构造注入
+  <constructor-arg value="The HAHA">
+  <constructor-arg>  
+    <list>
+      <value>..</value>
+      <value>..</value>
+    </list>
+  <constructor-arg>
+  <property name="" ref="">  //setter 注入
+</bean>
+</beans.....> 
+
+<beans>
+  <context:component-scan base-package="包名">
+</beans>
+(2)基于Java的配置，配置类   AnnotationConfigApplicationContext或AnnotationConfigWebApplicationContext
+@Configuration 表明是配置类
+@Bean
+每个方法返回一个接口Bean，方法名为接口名小写
+
+(3)组件扫描+自动装配
+组件扫面
+@Component 定义自动发现的bean 或 @Component("beanId")
+在配置类中启用组件扫面
+@Configuration
+@ComponentScan 或 @ComponentScan("包名")
+
+自动装配
+@Autowired
+可以用在构造器、类方法上、属性上
+
+如果上下文没有这个bean，则抛出NoBeansFoundException
+解决方法
+@Autowired(required=false)
+
+@Service("serviceName")
+
+(4)当需要加载第三方库中的类时，只能采用显示装配
+1.3 获取bean
+
+原始接口：
+ClassPathXmlApplicationContext 从类路径
+或FileSystemApplicationContext 从文件系统
+或XmlWebApplicationContext
+
+Knight为接口
+ApplicationContext context = new ClassPathXmlApplicationContext("META-INF/spring/knight.xml")；
+Knight knight = contex.getBean(Knight.class);
+
+实例化Bean——值和应用注入——
+
+BeanNameAware
+BeanFactoryAware
+ApplicationContextAware 与该bean的上下文有关
+
+1.4 Spring测试
+Junit
+MocKito
+
+@RunWith(SpringJunit4ClassRunner.class)
+@ContextConfiguration(classes=CDPlaterConfig.class)
+@ContextConfiguration(locations="classpath:META-INF/spring/quest.xml")
+
+Quest mock = Mockito.mock(Quest.class);
+
+1.5 Profile
+<beans profile="dev">
+</beans>
+<beans profile="qa">
+</beans>
+
+@ActiveProfiles("dev")
+
+1.6 条件化Bean 解决转配歧义
+@Conditional()
+@Primary
+@Qualifier("beanId")
+
+1.7 Bean的作用域
+
+1.8 运行时值注入
+(1)注入外部值
+声明属性源
+@PropertySource("classpath:/com/soundsystem/app.properties") 
+Spring将属性文件加载到Environment中
+属性占位符
+${jdbc.url}
+
+(2)组件扫描+自动装配的情况下
+使用@Value注解
+PropertyPlaceholderCOnfigurer
+<context:property-placeholder />
